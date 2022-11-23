@@ -4,8 +4,9 @@ const taskSchema=new mongoose.Schema({
     projectid:{type:String, required:true},
     taskname:{type:String, required:true},
     description:{type:String, required:true},
-    isCompleted:{type:Boolean, required:true, default:false}
-},{ timestamps: true }
+    isCompleted:{type:Boolean, required:true, default:false},
+    createDate:{type:String,required:true}
+}
 )
 const taskModel=mongoose.model("task",taskSchema)
 

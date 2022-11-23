@@ -11,6 +11,21 @@ taskRoutes.get("/",async(req,res)=>{
     return res.send({message:"all task",data:alltask,total:count})
 })
 
+//get report
+
+taskRoutes.get("/report/:startdate/:enddate",async(req,res)=>{
+const {startdate,enddate}=req.params
+console.log('startdate:', startdate)
+
+
+    const data=await taskModel.aggregate([
+        {$match:{createDate:{$gte:startdate.toString(),$lte:enddate.toString()}}},
+        {$group:{_id:{date:"$createDate"},added:{$count:{}},}},
+
+    ])
+    return res.send(data)
+})
+
  //get specific project tasks
 taskRoutes.get("/:projectid",authentication,async(req,res)=>{
     const {projectid}=req.params
@@ -23,8 +38,13 @@ taskRoutes.get("/:projectid",authentication,async(req,res)=>{
 taskRoutes.post("/create/:projectid",authentication,async(req,res)=>{
     const {projectid}=req.params
     const {taskname,description}=req.body
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    const yyyy = today.getFullYear();
+    const currentDate=(`${yyyy}-${mm}-${dd}`)
     const newTask=new taskModel({
-        projectid,taskname,description
+        projectid,taskname,description,createDate:currentDate
     })
     await newTask.save()
     return res.send({message:"new task add",data:newTask})
